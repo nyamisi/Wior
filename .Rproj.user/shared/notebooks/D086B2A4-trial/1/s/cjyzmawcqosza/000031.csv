@@ -1,0 +1,6 @@
+"0","paste(""get_"", variable_id[1], suffix = ""()"", sep = """")
+"
+"1","[1]"
+"1"," ""get_chlModis()"""
+"1","
+"

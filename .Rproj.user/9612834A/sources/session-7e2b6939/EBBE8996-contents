@@ -1,0 +1,128 @@
+---
+title: "Untitled"
+format: html
+---
+
+```{r}
+require(tidyverse)
+require(rerddap)
+require(lubridate)
+```
+
+```{r}
+rerddap::ed_search(query = "modis")
+```
+
+```{r}
+chla =rerddap::griddap("erdMH1chlamday", 
+                      latitude =  c(-11, -3),
+                      longitude = c(38, 45),
+                      time = c("2020-01-30", "2021-12-30"), 
+                      fmt = "csv")
+```
+
+
+
+```{r}
+
+chla %>% 
+  as_tibble() %>% 
+  mutate(time = as_date(time))
+```
+
+```{r}
+chla %>% 
+  filter(time == "2021-08-16T00:00:00Z") %>% 
+  ggplot(aes(x = longitude, y = latitude, z = chlorophyll))+
+  metR::geom_contour_fill()+
+  scale_fill_gradientn(colours = oce::oceColors9A(120), trans = scales::log10_trans())+
+  coord_equal(xlim = c(38,41),
+              ylim = c(-8,-7))
+```
+
+```{r}
+mm = wior::get_rainLand(lon.min = 32,
+                        lon.max = 35,
+                        lat.min = -9,
+                        lat.max = -1,
+                        t1 = "1990-01-01", 
+                        t2 = "2020-12-31",
+                        level = 3)
+```
+
+```{r}
+cc = wior::get_chlModis(lon.min = 5,
+                   lon.max = 9,
+                   lat.min = -8,
+                   lat.max = -5,
+                   t1 = "2020-01-01",
+                   t2 = "2020-12-31",
+                   level = 3)
+```
+
+```{r}
+variable_id = c("chlModis", "sstModis",  "ppMODIS")
+
+paste(prefix = "get_", variable_id[3], sep = "")
+
+paste("get_", variable_id[1], suffix = "()", sep = "")
+
+
+ss = paste("get_", variable_id[1], sep = "_")(lon.min = 5,
+                   lon.max = 9,
+                   lat.min = -8,
+                   lat.max = -5,
+                   t1 = "2020-01-01",
+                   t2 = "2020-12-31",
+                   level = 3)
+
+function(){paste(prefix = "get_", variable_id[1], sep = "")}
+
+
+paste(prefix = "get_", input$variable_id, sep = "")(lon.min = input$lon_min,
+                       lon.max = input$lon_max,
+                       lat.min = input$lat_min,
+                       lat.max = input$lat_max,
+                       t1 = input$date_id,
+                       t2 = input$date_id,
+                       level = input$level_id)
+
+```
+
+
+
+
+
+
+
+
+
+
+```{r}
+case_when(
+      input$variable_id == "chlModis" ~ wior::get_chlModis(lon.min = input$lon_min,
+                                                      lon.max = input$lon_max,
+                                                      lat.min = input$lat_min,
+                                                      lat.max = input$lat_max,
+                                                      t1 = input$date_id,
+                                                      t2 = input$date_id,
+                                                      level = input$level_id),
+      input$variable_id == "sstModis" ~ wior::get_sstMODIS(lon.min = input$lon_min,
+                                                      lon.max = input$lon_max,
+                                                      lat.min = input$lat_min,
+                                                      lat.max = input$lat_max,
+                                                      t1 = input$date_id,
+                                                      t2 = input$date_id,
+                                                      level = input$level_id),
+      
+      input$variable_id == "ppMODIS" ~ wior::get_ppMODIS(lon.min = input$lon_min,
+                                                         lon.max = input$lon_max,
+                                                         lat.min = input$lat_min,
+                                                         lat.max = input$lat_max,
+                                                         t1 = input$date_id,
+                                                         t2 = input$date_id,
+                                                         level = input$level_id)
+      
+    )
+```
+
